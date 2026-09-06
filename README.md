@@ -17,6 +17,7 @@ Booking Receipt: After submitting a booking, the customer sees a detailed receip
 (if applicable), date, status, and total price.
 About & Contact: An About section explaining why to choose Bloomify, plus a Contact Us with email and location.
 Design: A single-page layout (no page reloads between sections) with a pink-and-white theme, a falling flower-petal animation, and an elegant serif heading font.
+
 TECH STACK
 
 Backend: Java, Spring Boot, Spring Data JPA
