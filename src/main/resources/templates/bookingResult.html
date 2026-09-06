@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Receipt - Bloomify</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f7c9d8; color: #4a2c35; min-height: 100vh; }
+
+        .petal-layer { position: fixed; inset: 0; pointer-events: none; z-index: 5; overflow: hidden; }
+        .petal { position: absolute; top: -40px; font-size: 22px; opacity: 0.85; animation-name: fall; animation-timing-function: linear; animation-iteration-count: infinite; }
+        @keyframes fall {
+            0%   { transform: translateY(0) rotate(0deg); opacity: 0.9; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0.4; }
+        }
+        .petal:nth-child(1) { left: 5%;  animation-duration: 9s;  animation-delay: 0s; }
+        .petal:nth-child(2) { left: 18%; animation-duration: 11s; animation-delay: 1s; }
+        .petal:nth-child(3) { left: 32%; animation-duration: 8s;  animation-delay: 2s; }
+        .petal:nth-child(4) { left: 46%; animation-duration: 12s; animation-delay: 0.5s; }
+        .petal:nth-child(5) { left: 60%; animation-duration: 10s; animation-delay: 1.5s; }
+        .petal:nth-child(6) { left: 74%; animation-duration: 9s;  animation-delay: 2.5s; }
+        .petal:nth-child(7) { left: 85%; animation-duration: 11s; animation-delay: 0.8s; }
+        .petal:nth-child(8) { left: 95%; animation-duration: 13s; animation-delay: 1.8s; }
+
+        .navbar { background: #b3567a; padding: 16px 40px; position: relative; z-index: 10; }
+        .navbar a { color: white; text-decoration: none; font-weight: bold; font-size: 24px; }
+
+        .receipt-box { position: relative; z-index: 10; max-width: 480px; margin: 60px auto; background: white; padding: 35px; border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); text-align: center; }
+        .receipt-box h2.accepted { color: #2e9e5b; }
+        .receipt-box h2.denied { color: #b3567a; }
+        .receipt-box p.subtitle { color: #7a4b57; margin-bottom: 20px; }
+
+        .details { text-align: left; background: #fdf0f4; border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .details .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0c9d6; font-size: 14px; }
+        .details .row:last-child { border-bottom: none; }
+        .details .label { color: #a15c6e; font-weight: 600; }
+        .details .value { color: #4a2c35; font-weight: bold; text-align: right; }
+
+        a.back-link { display: inline-block; margin-top: 10px; color: white; background: #b3567a; padding: 10px 28px; border-radius: 20px; text-decoration: none; font-weight: bold; }
+        a.back-link:hover { background: #f7c9d8; color: #7a1f3d; }
+    </style>
+</head>
+<body>
+
+    <div class="petal-layer">
+        <span class="petal">🌻</span><span class="petal">🌹</span><span class="petal">🌸</span><span class="petal">🌷</span>
+        <span class="petal">🌸</span><span class="petal">🌺</span><span class="petal">🌷</span><span class="petal">🌹</span>
+    </div>
+
+    <div class="navbar"><a href="/">🌸 BLOOMIFY</a></div>
+
+    <div class="receipt-box">
+
+        <div th:if="${booking.status == 'Accepted'}">
+            <h2 class="accepted" th:text="${booking.orderType == 'Event'} ? 'Your Event Is Booked!' : 'Your Flowers Are On The Way!'"></h2>
+            <p class="subtitle" th:text="${booking.orderType == 'Event'} ? 'We will contact you soon to confirm the details.' : 'We will prepare and deliver your fresh flowers soon.'"></p>
+        </div>
+
+        <div th:if="${booking.status == 'Denied'}">
+            <h2 class="denied">Sorry, Not Enough Stock</h2>
+            <p class="subtitle">Please try a smaller quantity or a different flower.</p>
+        </div>
+
+        <div class="details">
+            <div class="row"><span class="label">Name</span><span class="value" th:text="${booking.customerName}"></span></div>
+            <div class="row"><span class="label">Flower</span><span class="value" th:text="${booking.flowerName}"></span></div>
+            <div class="row"><span class="label">Quantity</span><span class="value" th:text="${booking.quantity}"></span></div>
+            <div class="row"><span class="label">Order Type</span><span class="value" th:text="${booking.orderType}"></span></div>
+            <div class="row"><span class="label">State</span><span class="value" th:text="${booking.state}"></span></div>
+            <div class="row"><span class="label">City</span><span class="value" th:text="${booking.city}"></span></div>
+            <div class="row"><span class="label">Address</span><span class="value" th:text="${booking.address}"></span></div>
+            <div class="row" th:if="${booking.orderType == 'Event'}"><span class="label">Event Type</span><span class="value" th:text="${booking.venueType}"></span></div>
+            <div class="row"><span class="label">Date</span><span class="value" th:text="${booking.eventDate}"></span></div>
+            <div class="row"><span class="label">Status</span><span class="value" th:text="${booking.status}"></span></div>
+            <div class="row">
+                <span class="label">Total Price</span>
+                <span class="value">Rs. <span th:text="${booking.totalPrice}">0.00</span></span>
+            </div>
+        </div>
+
+        <a href="/" class="back-link">Back to Bloomify</a>
+    </div>
+
+</body>
+</html>

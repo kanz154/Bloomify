@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bloomify — Your Celebration, Our Blooms</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff5f8; color: #4a2c35; }
+        .serif { font-family: 'Playfair Display', Georgia, serif; }
+
+        .petal-layer { position: fixed; inset: 0; pointer-events: none; z-index: 5; overflow: hidden; }
+        .petal { position: absolute; top: -40px; font-size: 22px; opacity: 0.85; animation-name: fall; animation-timing-function: linear; animation-iteration-count: infinite; }
+        @keyframes fall {
+            0%   { transform: translateY(0) rotate(0deg); opacity: 0.9; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0.4; }
+        }
+        .petal:nth-child(1) { left: 5%;  animation-duration: 9s;  animation-delay: 0s; }
+        .petal:nth-child(2) { left: 18%; animation-duration: 11s; animation-delay: 1s; }
+        .petal:nth-child(3) { left: 32%; animation-duration: 8s;  animation-delay: 2s; }
+        .petal:nth-child(4) { left: 46%; animation-duration: 12s; animation-delay: 0.5s; }
+        .petal:nth-child(5) { left: 60%; animation-duration: 10s; animation-delay: 1.5s; }
+        .petal:nth-child(6) { left: 74%; animation-duration: 9s;  animation-delay: 2.5s; }
+        .petal:nth-child(7) { left: 85%; animation-duration: 11s; animation-delay: 0.8s; }
+        .petal:nth-child(8) { left: 95%; animation-duration: 13s; animation-delay: 1.8s; }
+
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+            background: rgba(179, 32, 79, 0.95);
+            backdrop-filter: blur(6px);
+            padding: 14px 40px; display: flex; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        .navbar .logo {
+            flex: 1; font-weight: 700; color: #ffffff; text-decoration: none;
+            font-size: 30px; letter-spacing: 0.5px;
+        }
+        .navbar .nav-center { flex: 1; display: flex; justify-content: center; gap: 36px; }
+        .navbar .nav-center a { color: #ffffff; text-decoration: none; font-weight: 700; font-size: 15px; } 
+        .navbar .nav-center a:hover { color: #ffc2d9; }
+        .navbar .auth { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+        .navbar .auth a { padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; text-decoration: none; border: 1.5px solid white; }
+        .navbar .auth a.signin { color: white; background: transparent; } 
+        .navbar .auth a.signup { color: #b3204f; background: white; } 
+        .navbar .auth a.logout { color: white; background: transparent; border: 1.5px solid rgba(255,255,255,0.6); }
+
+        .hero { position: relative; min-height: 100vh; display: flex; padding-top: 66px; }
+        .hero-left { flex: 1; background: #efa6bd; display: flex; align-items: center; justify-content: center; padding: 60px; text-align: center; }
+        .hero-left h1 { font-size: 38px; color: #d6336c; line-height: 1.35; }
+        .hero-left p { margin-top: 14px; color: #d6336c; font-size: 15px; }
+        .hero-left a.cta { display: inline-block; margin-top: 22px; background: #d6336c; color: white; padding: 12px 30px; border-radius: 30px; text-decoration: none; font-weight: bold; }
+        .hero-left a.cta:hover { background: #96415f; }
+
+        .hero-right { flex: 1; background: #b39aa0; display: flex; align-items: center; justify-content: center; }
+        .hero-collage { 
+            position: relative; 
+            width: 650px; 
+            height: 450px; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 30px;
+            padding: 30px;
+            margin-top: -85px;
+        }
+        .polaroid { 
+            background: white; 
+            padding: 12px 12px 35px; 
+            border-radius: 8px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+        .polaroid:hover {
+            transform: scale(1.08) rotate(0deg) !important;
+            z-index: 10;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+        }
+        .polaroid:nth-child(1) { transform: rotate(-10deg); }
+        .polaroid:nth-child(2) { transform: rotate(8deg); }
+        .polaroid:nth-child(3) { transform: rotate(6deg); }
+        .polaroid:nth-child(4) { transform: rotate(-7deg); }
+        .polaroid img { 
+            width: 100%; 
+            height: 200px; 
+            object-fit: cover; 
+            border-radius: 4px;
+            display: block;
+        }
+
+        .page-section { display: none; }
+        .page-section:target { display: block; position: fixed; inset: 0; overflow-y: auto; background: #fff5f8; z-index: 200; padding: 100px 40px 60px; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #d6336c; font-weight: bold; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+
+        .section-title { text-align: center; color: #d6336c; font-size: 30px; margin-bottom: 35px; }
+
+        .flower-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; }
+        .flower-card { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 3px 12px rgba(0,0,0,0.08); text-align: center; padding-bottom: 15px; transition: transform 0.2s; }
+        .flower-card:hover { transform: translateY(-5px); }
+        .flower-card .placeholder-photo { width: 100%; height: 160px; font-size: 40px; }
+        .flower-card h3 { margin: 12px 0 5px; color: #d6336c; }
+
+        .flower-card .price-tag {
+            color: #7a4b57;
+            font-weight: 600;
+            font-size: 15px;
+            margin: 6px 0 12px 0;
+        }
+
+        .flower-card .stock { font-size: 12px; font-weight: bold; margin-bottom: 10px; padding: 4px 10px; border-radius: 12px; display: inline-block; }
+        .flower-card .stock.in { color: #2e9e5b; background: #e6f7ed; }
+        .flower-card .stock.out { color: #d6336c; background: #ffe3ec; }
+        .flower-card a.book-btn { display: inline-block; background: #efa6bd; color: #7a1f3d; padding: 8px 18px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 13px; margin-top: 6px; }
+        .flower-card a.book-btn:hover { background: #d982a2; color: white; }
+
+        .form-container { max-width: 480px; margin: 0 auto; background: white; padding: 35px; border-radius: 16px; box-shadow: 0 3px 15px rgba(0,0,0,0.08); }
+        .form-container h2 { color: #d6336c; margin-bottom: 20px; text-align: center; }
+        input, select { width: 100%; padding: 11px; margin: 8px 0; border-radius: 8px; border: 1px solid #f3c6d6; background: #fffafc; font-size: 14px; }
+        label { font-size: 13px; color: #7a4b57; font-weight: 600; }
+        button, input[type="submit"] { width: 100%; background: #d6336c; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover, input[type="submit"]:hover { background: #b3204f; }
+    </style>
+</head>
+<body>
+
+    <div class="petal-layer">
+        <span class="petal">🌻</span><span class="petal">🌷</span><span class="petal">🌸</span><span class="petal">🌹</span>
+        <span class="petal">🌸</span><span class="petal">🌺</span><span class="petal">🌷</span><span class="petal">🌹</span>
+    </div>
+
+    <div class="navbar">
+        <a href="#hero" class="logo serif">🌸 BLOOMIFY</a>
+        <div class="nav-center">
+            <a href="#hero">Home</a>
+            <a href="#flowers">Flowers</a>
+            <a href="#events">Events</a>
+            <a href="#book">Book Now</a>
+            <a href="#about">About</a>
+        </div>
+        <div class="auth" th:if="${loggedInUser == null}">
+            <a href="#login" class="signin">Sign In</a>
+            <a href="#register" class="signup">Register</a>
+        </div>
+        <div class="auth" th:if="${loggedInUser != null}">
+            <span style="color:white; font-weight:600;" th:text="'Hi, ' + ${loggedInUser}"></span>
+            <a href="/users/logout" class="logout">Logout</a>
+        </div>
+    </div>
+
+    <section class="hero" id="hero">
+        <div class="hero-left">
+            <div>
+                <h1 class="serif">Fresh Flowers,<br>Timeless Moments</h1>
+                <p>What are we celebrating today? Choose daily delivery or custom event styling.</p>
+                <a href="#flowers" class="cta">Start Blooming</a>
+            </div>
+        </div>
+        <div class="hero-right">
+            <div class="hero-collage">
+                <div class="polaroid">
+                    <img src="https://images.unsplash.com/photo-1582550529280-7fc8e90934e0?q=80&w=2114&auto=format&fit=crop" alt="Pink flower bouquet">
+                </div>
+                <div class="polaroid">
+                    <img src="https://images.pexels.com/photos/32300948/pexels-photo-32300948.jpeg" alt="Colorful floral bouquets">
+                </div>
+                <div class="polaroid">
+                    <img src="https://images.unsplash.com/photo-1714004941173-0054629146c2?q=80&w=1470&auto=format&fit=crop" alt="Event setup with tables">
+                </div>
+                <div class="polaroid">
+                    <img src="https://images.unsplash.com/photo-1641996250159-9d2bbfb483fa?q=80&w=687&auto=format&fit=crop" alt="Wedding event setup">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="page-section" id="flowers">
+        <a href="#hero" class="back-link">← Back to Home</a>
+        <h2 class="section-title serif">Our Flower Collection</h2>
+        <div class="flower-grid">
+            <div class="flower-card" th:each="flower : ${flowers}">
+                <img th:src="${flower.imageUrl}" alt="flower-image" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px 8px 0 0;">
+                <h3 th:text="${flower.name}">Flower Name</h3>
+                <p class="price-tag">Rs. <span th:text="${flower.price}">0</span></p>
+                <span class="stock in" th:if="${flower.stockQuantity > 0}" th:text="'In Stock (' + ${flower.stockQuantity} + ')'">In Stock</span>
+                <span class="stock out" th:if="${flower.stockQuantity == 0}">Out of Stock</span>
+                <div><a href="#book" class="book-btn">Book For Bouquets</a></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="page-section" id="events">
+        <a href="#hero" class="back-link">← Back to Home</a>
+        <h2 class="section-title serif">Event Setups</h2>
+        <div class="flower-grid">
+            <div class="flower-card">
+                <img src="https://images.pexels.com/photos/14457392/pexels-photo-14457392.jpeg" alt="Birthday Party Setup" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px 8px 0 0;">
+                <h3>Birthday Party</h3>
+                <p class="price-tag">Rs. 25,000</p>
+                <div><a href="#book" class="book-btn">Book For An Events</a></div>
+            </div>
+            <div class="flower-card">
+                <img src="https://images.unsplash.com/photo-1738217383996-9947554e9f28?q=80&w=687&auto=format&fit=crop" alt="Wedding Setup" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px 8px 0 0;">
+                <h3>Weddings</h3>
+                <p class="price-tag">Rs. 150,000</p>
+                <div><a href="#book" class="book-btn">Book For An Events</a></div>
+            </div>
+            <div class="flower-card">
+                <img src="https://plus.unsplash.com/premium_photo-1674759553489-4f88fd56b2cd?q=80&w=688&auto=format&fit=crop" alt="Outdoor Setup" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px 8px 0 0;">
+                <h3>Outdoor Events</h3>
+                <p class="price-tag">Rs. 80,000</p>
+                <div><a href="#book" class="book-btn">Book For An Events</a></div>
+            </div>
+            <div class="flower-card">
+                <img src="https://images.pexels.com/photos/39193787/pexels-photo-39193787.jpeg" alt="Indoor Setup" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px 8px 0 0;">
+                <h3>Indoor Events</h3>
+                <p class="price-tag">Rs. 60,000</p>
+                <div><a href="#book" class="book-btn">Book For An Events</a></div>
+            </div>
+            <div class="flower-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDfV47Wm6f2mOle65dPqC89jdeRTN7wHP7nWY3PPMBEj8Z9qyYZQ4hRY4&s=10" alt="Corporate Office Setup" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px 8px 0 0;">
+                <h3>Corporate / Office Events</h3>
+                <p class="price-tag">Rs. 45,000</p>
+                <div><a href="#book" class="book-btn">Book For An Events</a></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="page-section" id="book">
+        <a href="#hero" class="back-link">← Back to Home</a>
+        <h2 class="section-title serif">Book a Flower or an Event</h2>
+        <div class="form-container">
+            <form action="/bookings/add" method="post">
+                <label>Your Name</label>
+                <input type="text" name="customerName" placeholder="Your Name" required>
+
+                <label>Choose Flower</label>
+                <select name="flowerName" required>
+                <option value="">Select a Flower</option>
+                <option th:each="flower : ${flowers}" 
+                th:value="${flower.name}" 
+                th:text="${flower.name} + ' - Rs. ' + ${flower.price} + ' (Each)'">
+              Flower
+               </option>
+               </select>
+
+                <label>Quantity</label>
+                <input type="number" name="quantity" placeholder="How many?" min="1" required>
+
+                <label>Order Type</label>
+                <select name="orderType" required>
+                    <option value="">Select Order Type</option>
+                    <option value="Delivery">Direct Delivery</option>
+                    <option value="Event">Event Booking</option>
+                </select>
+
+                <label>State</label>
+                <input type="text" name="state" placeholder="e.g. Sindh, Punjab" required>
+
+                <label>City</label>
+                <input type="text" name="city" placeholder="e.g. Karachi, Lahore" required>
+
+                <label>Address</label>
+                <input type="text" name="address" placeholder="Street / area / house no." required>
+
+                <label>Event Type (only for Event bookings)</label>
+                <select name="venueType">
+                    <option value="">Select Event Type</option>
+                    <option value="Birthday Party">Birthday Party</option>
+                    <option value="Weddings">Wedding</option>
+                    <option value="Outdoor events">Outdoor Setup</option>
+                    <option value="Indoor Events">Indoor</option>
+                    <option value="Corporate/Office Setup for celebrations">Corporate/Office Setup for celebrations</option>
+                </select>
+
+                <label>Date Needed</label>
+                <input type="date" name="eventDate" required>
+
+                <button type="submit">Submit Request</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="page-section" id="about">
+    <a href="#hero" class="back-link">← Back to Home</a>
+    <h2 class="section-title serif">Why Choose Us</h2>
+    <div class="form-container" style="text-align:left;">
+        <p style="margin-bottom:14px; line-height:1.6;">
+            At Bloomify, we bring fresh, beautifully arranged flowers to your doorstep, whether it's a simple bouquet for someone special, or a full floral setup for your big event.
+        </p>
+        <p style="margin-bottom:14px; line-height:1.6;">
+            We offer daily flower delivery, and complete event styling for birthdays, weddings, outdoor gatherings, and corporate/office celebrations. Every arrangement is made with care, using the freshest flowers available.
+        </p>
+        <p style="line-height:1.6;">
+            We treat every petal like it’s for our own family's celebration.
+        </p>
+        <footer style="text-align:center; padding:30px; background:#fdf0f4; color:#7a4b57; font-size:14px;">
+       <p style="margin-bottom:8px;"><strong>Contact Us</strong></p>
+       <p>📧 bloomify.flowers@gmail.com</p>
+       <p>📍 Karachi, Pakistan</p>
+      </footer>
+    </div>
+</section>
+
+    <section class="page-section" id="login">
+        <a href="#hero" class="back-link">← Back to Home</a>
+        <h2 class="section-title serif">Sign In</h2>
+        <div class="form-container">
+            <form action="/users/login" method="post">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Username" required>
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Sign In</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="page-section" id="register">
+        <a href="#hero" class="back-link">← Back to Home</a>
+        <h2 class="section-title serif">Register</h2>
+        <div class="form-container">
+            <form action="/users/register" method="post">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Username" required>
+                <label>Email</label>
+                <input type="email" name="email" placeholder="Email" required>
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    </section>
+
+</body>
+</html>
